@@ -189,5 +189,4 @@ def oncamerafeed():
   cap.release()
 
 
-while(True):
-  oncamerafeed() #callit
+oncamerafeed() #callit
