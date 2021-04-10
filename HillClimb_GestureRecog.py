@@ -28,13 +28,6 @@ def recognizeHandGesture(landmarks , label):
         thumbRight = False
         thumbLeft = False
         recognizedHandGesture = None
-        if (landmarks[4]['y'] < landmarks[3]['y'] < landmarks[5]['y'] < landmarks[9]['y'] < landmarks[13]['y'] <
-                landmarks[17]['y'] and landmarks[6]['x'] < landmarks[7]['x']):
-            print ( 'Thumbs Up' )
-
-        elif (landmarks[4]['y'] > landmarks[3]['y'] > landmarks[5]['y'] > landmarks[9]['y'] > landmarks[13]['y'] >
-              landmarks[17]['y'] and landmarks[6]['x'] < landmarks[7]['x']):
-            print ( 'Thumbs down' )
 
         if label.strip () == 'Left':
             print ( 'left' )
@@ -96,22 +89,22 @@ def recognizeHandGesture(landmarks , label):
             #     slide(landmarks[0]['x']*img_width,landmarks[0]['y']*img_height,landmarks[9]['x']*img_width,landmarks[9]['y']*img_height)
             #     keyboard.press_and_release('Page Down')
 
-            recognizedHandGesture = 4  # "FOUR"
+            recognizedHandGesture = "4"  # "FOUR"
         elif thumbState == 'CLOSE' and indexFingerState == 'OPEN' \
                 and middleFingerState == 'OPEN' and ringFingerState == 'OPEN' \
                 and littleFingerState == 'CLOSE':
 
-            recognizedHandGesture = 3  # "THREE"
+            recognizedHandGesture = "3"  # "THREE"
 
         elif thumbState == 'CLOSE' and indexFingerState == 'CLOSE' \
                 and middleFingerState == 'CLOSE' and ringFingerState == 'CLOSE' \
                 and littleFingerState == 'CLOSE':
-            recognizedHandGesture = 'Fist'  # "FIST"
+            recognizedHandGesture = "Fist"  # "FIST"
 
         elif thumbState == 'CLOSE' and indexFingerState == 'OPEN' \
                 and middleFingerState == 'OPEN' and ringFingerState == 'CLOSE' \
                 and littleFingerState == 'CLOSE':
-            recognizedHandGesture = '2'  # "Victory"
+            recognizedHandGesture = "2"  # "Victory"
 
         elif (
                 thumbState == 'OPEN' and thumbLeft and indexFingerState == 'CLOSE' and middleFingerState == 'CLOSE' and ringFingerState == 'CLOSE' and littleFingerState == 'CLOSE'):
@@ -125,57 +118,76 @@ def recognizeHandGesture(landmarks , label):
                 and middleFingerState == 'CLOSE' and ringFingerState == 'CLOSE' \
                 and littleFingerState == 'CLOSE':
 
-            recognizedHandGesture = 1 
+            recognizedHandGesture = "1" 
         else:
-            recognizedHandGesture = 0 
+            recognizedHandGesture = "0" 
 
-        print ( thumbState ,
-                indexFingerState ,
-                middleFingerState ,
-                ringFingerState ,
-                littleFingerState ,
-
-                )
+        #print ( thumbState ,
+        #        indexFingerState ,
+        #        middleFingerState ,
+        #        ringFingerState ,
+        #        littleFingerState ,
+        #        )
         return recognizedHandGesture
 
 # For webcam input:
-cap = cv2.VideoCapture(0)
-with mp_hands.Hands(
-    min_detection_confidence=0.5,
-    min_tracking_confidence=0.5) as hands:
-  while cap.isOpened():
-    success, image = cap.read()
-    if not success:
-      print("Ignoring empty camera frame.")
-      # If loading a video, use 'break' instead of 'continue'.
-      continue
+def oncamerafeed():
+  cap = cv2.VideoCapture(0)
+  #rand = 0
+  oldgesture = "Open Palm"
+  with mp_hands.Hands(
+      min_detection_confidence=0.5,
+      min_tracking_confidence=0.5, max_num_hands = 1) as hands:
+    while cap.isOpened():
+      success, image = cap.read()
+      if not success:
+        print("Ignoring empty camera frame.")
+        # If loading a video, use 'break' instead of 'continue'.
+        continue
 
-    # Flip the image horizontally for a later selfie-view display, and convert
-    # the BGR image to RGB.
-    image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB)
-    # To improve performance, optionally mark the image as not writeable to
-    # pass by reference.
-    image.flags.writeable = False
-    results = hands.process(image)
+      # Flip the image horizontally for a later selfie-view display, and convert
+      # the BGR image to RGB.
+      image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB)
+      # To improve performance, optionally mark the image as not writeable to
+      # pass by reference.
+      image.flags.writeable = False
+      results = hands.process(image)
 
-    # Draw the hand annotations on the image.
-    image.flags.writeable = True
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-    if results.multi_hand_landmarks:
-      for hand_landmarks in results.multi_hand_landmarks:
-        #print(hand_landmarks.landmark[0])
-        #mp_drawing.draw_landmarks(
-        #    image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-        landmark_data = []
-        for i in range(21):
-          landmark_data.append(hand_landmarks.landmark[i].x)
-          landmark_data.append(hand_landmarks.landmark[i].y)
-        #print(len(landmark_data))
-        recognizedHandGesture = recognizeHandGesture(getStructuredLandmarks(landmark_data), label)
-        print ('recognized hand gesture: ' , recognizedHandGesture )
-        #print(len(landmark_data))
+      # Draw the hand annotations on the image.
+      image.flags.writeable = True
+      image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+      if results.multi_hand_landmarks:
+        
+        for hand_landmarks in results.multi_hand_landmarks:
+          #print(hand_landmarks.landmark[0])
+          #mp_drawing.draw_landmarks(
+          #    image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+          landmark_data = []
+          
+          for i in range(21):
+            landmark_data.append(hand_landmarks.landmark[i].x)
+            landmark_data.append(hand_landmarks.landmark[i].y)
+          #print(len(landmark_data))
+          
+          recognizedHandGesture = recognizeHandGesture(getStructuredLandmarks(landmark_data), label)
+          #print(oldgesture)
+          #print(recognizedHandGesture)
+          if(recognizedHandGesture != oldgesture):
+            #print("change:" + str(recognizedHandGesture) + str(rand))
+            #rand += 1
+            oldgesture = recognizedHandGesture
+            print(recognizedHandGesture)
+          #else:
+            #pass
+            #print("same")
+          #print ('recognized hand gesture: ' , recognizedHandGesture)
+          #print(len(landmark_data))
 
-    cv2.imshow('Gestures', image)
-    if cv2.waitKey(5) & 0xFF == 27:
-      break
-cap.release()
+      cv2.imshow('Gestures', image)
+      if cv2.waitKey(5) & 0xFF == 27:
+        break
+  cap.release()
+
+
+while(True):
+  oncamerafeed() #callit
