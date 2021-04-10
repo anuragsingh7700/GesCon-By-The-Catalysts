@@ -7,12 +7,13 @@ window = Tk()
 window.title("Gesture Control App")
 # Adjust size  
 
-window.geometry("980x680")
+window.geometry("1540x850")
+
 
 
 # Add image file 
 
-bg = PhotoImage( file = "features-1.png") 
+bg = PhotoImage( file = "features-2.png") 
 # Show image using label 
 
 label1 = Label( window, image = bg) 
@@ -34,5 +35,5 @@ link1.place(relx = 0.73,
                    anchor = 'center')
 
 
-
+window.resizable(0,0)
 window.mainloop()
