@@ -1,5 +1,10 @@
 import cv2
 import mediapipe as mp
+import pyautogui
+from subprocess import run
+import time
+PackageFamilyName = "FINGERSOFT.HILLCLIMBRACING_r6rtpscs7gwyg"
+Id="App"
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 
@@ -131,14 +136,19 @@ def recognizeHandGesture(landmarks , label):
         return recognizedHandGesture
 
 # For webcam input:
-def oncamerafeed():
+def oncamerafeed(window):
+  window.destroy()
+  started = False
   cap = cv2.VideoCapture(0)
   #rand = 0
   oldgesture = "Open Palm"
+  run('explorer.exe shell:appsFolder\\'+ PackageFamilyName +'!'+Id)
+  print("Press Ctrl + C to exit the program!")
   with mp_hands.Hands(
       min_detection_confidence=0.5,
       min_tracking_confidence=0.5, max_num_hands = 1) as hands:
     while cap.isOpened():
+    #   pyautogui.sleep(0.5)
       success, image = cap.read()
       if not success:
         print("Ignoring empty camera frame.")
@@ -161,32 +171,41 @@ def oncamerafeed():
         for hand_landmarks in results.multi_hand_landmarks:
           #print(hand_landmarks.landmark[0])
           #mp_drawing.draw_landmarks(
-          #    image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+          #image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
           landmark_data = []
-          
-          for i in range(21):
-            landmark_data.append(hand_landmarks.landmark[i].x)
-            landmark_data.append(hand_landmarks.landmark[i].y)
-          #print(len(landmark_data))
-          
-          recognizedHandGesture = recognizeHandGesture(getStructuredLandmarks(landmark_data), label)
-          #print(oldgesture)
-          #print(recognizedHandGesture)
-          if(recognizedHandGesture != oldgesture):
-            #print("change:" + str(recognizedHandGesture) + str(rand))
-            #rand += 1
-            oldgesture = recognizedHandGesture
-            print(recognizedHandGesture)
-          #else:
+        #   print(started)
+          if not started:
+            if pyautogui.locateOnScreen('gas.png',confidence=0.9, grayscale=True) != None:
+              started = True
+          else:
+            for i in range(21):
+              landmark_data.append(hand_landmarks.landmark[i].x)
+              landmark_data.append(hand_landmarks.landmark[i].y)
+            recognizedHandGesture = recognizeHandGesture(getStructuredLandmarks(landmark_data), label)
+            if(recognizedHandGesture != oldgesture):
+                oldgesture = recognizedHandGesture
+                # print(recognizedHandGesture)
+
+            if (recognizedHandGesture == 'Open Palm'):
+                pyautogui.keyUp('right')
+                pyautogui.keyDown('left')
+            elif (recognizedHandGesture == 'Fist' or recognizedHandGesture == 'Thumb Left' ):
+                pyautogui.keyUp('left')
+                pyautogui.keyDown('right')
+            else:
+                pyautogui.keyUp('right')
+                pyautogui.keyUp('left')
+            if started :
+                if pyautogui.locateOnScreen('game_end.png', confidence = 0.9, grayscale=True) != None:
+                    started = False
+    #   time.sleep(0.1)
+        #   /else:
             #pass
             #print("same")
           #print ('recognized hand gesture: ' , recognizedHandGesture)
           #print(len(landmark_data))
 
-      cv2.imshow('Gestures', image)
-      if cv2.waitKey(5) & 0xFF == 27:
-        break
+    #   cv2.imshow('Gestures', image)
+    #   if cv2.waitKey(5) & 0xFF == 27:
+    #     break
   cap.release()
-
-
-oncamerafeed() #callit
