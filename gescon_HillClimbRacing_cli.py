@@ -3,7 +3,7 @@ import mediapipe as mp
 import pydirectinput
 import pyautogui
 from subprocess import run
-
+from time import sleep
 PackageFamilyName = "FINGERSOFT.HILLCLIMBRACING_r6rtpscs7gwyg"
 Id="App"
 mp_drawing = mp.solutions.drawing_utils
@@ -173,7 +173,7 @@ def oncamerafeed(window):
           #print(hand_landmarks.landmark[0])
           mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
           landmark_data = []
-          print(started)
+        #   print(started)
           if not started:
             if pyautogui.locateOnScreen('gas.png',confidence=0.7) != None:
               started = True
@@ -199,7 +199,7 @@ def oncamerafeed(window):
                     print('none')
                 if pyautogui.locateOnScreen('game_end.png', confidence = 0.8, grayscale=True) != None:
                     started = False
-    #   time.sleep(0.1)
+      sleep(0.05)
         #   /else:
             #pass
             #print("same")
