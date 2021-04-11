@@ -170,8 +170,7 @@ def oncamerafeed(window):
         
         for hand_landmarks in results.multi_hand_landmarks:
           #print(hand_landmarks.landmark[0])
-          #mp_drawing.draw_landmarks(
-          #image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+          mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
           landmark_data = []
         #   print(started)
           if not started:
@@ -209,3 +208,7 @@ def oncamerafeed(window):
     #   if cv2.waitKey(5) & 0xFF == 27:
     #     break
   cap.release()
+
+from tkinter import *
+if __name__ == "__main__":
+    oncamerafeed(Tk())
