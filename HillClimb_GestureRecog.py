@@ -1,8 +1,9 @@
 import cv2
 import mediapipe as mp
+import pydirectinput
 import pyautogui
 from subprocess import run
-import time
+
 PackageFamilyName = "FINGERSOFT.HILLCLIMBRACING_r6rtpscs7gwyg"
 Id="App"
 mp_drawing = mp.solutions.drawing_utils
@@ -148,7 +149,7 @@ def oncamerafeed(window):
       min_detection_confidence=0.5,
       min_tracking_confidence=0.5, max_num_hands = 1) as hands:
     while cap.isOpened():
-    #   pyautogui.sleep(0.5)
+    #   pydirectinput.sleep(0.5)
       success, image = cap.read()
       if not success:
         print("Ignoring empty camera frame.")
@@ -172,9 +173,9 @@ def oncamerafeed(window):
           #print(hand_landmarks.landmark[0])
           mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
           landmark_data = []
-        #   print(started)
+          print(started)
           if not started:
-            if pyautogui.locateOnScreen('gas.png',confidence=0.9, grayscale=True) != None:
+            if pyautogui.locateOnScreen('gas.png',confidence=0.7) != None:
               started = True
           else:
             for i in range(21):
@@ -183,19 +184,20 @@ def oncamerafeed(window):
             recognizedHandGesture = recognizeHandGesture(getStructuredLandmarks(landmark_data), label)
             if(recognizedHandGesture != oldgesture):
                 oldgesture = recognizedHandGesture
-                # print(recognizedHandGesture)
-
-            if (recognizedHandGesture == 'Open Palm'):
-                pyautogui.keyUp('right')
-                pyautogui.keyDown('left')
-            elif (recognizedHandGesture == 'Fist' or recognizedHandGesture == 'Thumb Left' ):
-                pyautogui.keyUp('left')
-                pyautogui.keyDown('right')
-            else:
-                pyautogui.keyUp('right')
-                pyautogui.keyUp('left')
-            if started :
-                if pyautogui.locateOnScreen('game_end.png', confidence = 0.9, grayscale=True) != None:
+                print(recognizedHandGesture)
+                if (recognizedHandGesture == 'Open Palm'):
+                    pydirectinput.keyUp('right')
+                    pydirectinput.keyDown('left')
+                    print('left')
+                elif (recognizedHandGesture == 'Fist' or recognizedHandGesture == 'Thumb Left' ):
+                    pydirectinput.keyUp('left')
+                    pydirectinput.keyDown('right')
+                    print('right')
+                else:
+                    pydirectinput.keyUp('right')
+                    pydirectinput.keyUp('left')
+                    print('none')
+                if pyautogui.locateOnScreen('game_end.png', confidence = 0.8, grayscale=True) != None:
                     started = False
     #   time.sleep(0.1)
         #   /else:
